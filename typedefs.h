@@ -33,18 +33,6 @@
  * Boolean definitions
  */
 
-#ifndef bool
-#define bool int
-#endif
-
-#if !defined(false) || (false != 0)
-#define false	0
-#endif
-
-#if !defined(true) || (true != 0)
-#define true	1
-#endif
-
 #if !defined(FALSE) || (FALSE != false)
 #define FALSE	false
 #endif

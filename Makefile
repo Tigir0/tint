@@ -33,21 +33,21 @@ mandir = $(DESTDIR)/usr/share/man
 localstatedir = $(DESTDIR)/var/games
 
 ifeq ($(CC),)
-CC = gcc
+CC = g++
 else
 ifeq ($(CC),colorgcc)
 	ifneq ($(CROSS),)
-	CC = gcc
+	CC = g++
 	endif
 endif
 endif
 
-CFLAGS += -Wall
+CFLAGS += -Wall -std=c++14
 CPPFLAGS = -DSCOREFILE=\"$(localstatedir)/$(PRG).scores\" #-DUSE_RAND
 LDLIBS = -lncurses
 
 OBJ = engine.o utils.o io.o tint.o
-SRC = $(OBJ:%.o=%.c)
+SRC = $(OBJ:%.o=%.cpp)
 PRG = tint
 
        ########### NOTHING TO EDIT BELOW THIS ###########

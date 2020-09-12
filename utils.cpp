@@ -34,30 +34,6 @@
 #include "typedefs.h"
 
 /*
- * Initialize random number generator
- */
-void rand_init ()
-{
-#ifdef USE_RAND
-   srand (time (NULL));
-#else
-   srandom (time (NULL));
-#endif
-}
-
-/*
- * Generate a random number within range
- */
-int rand_value (int range)
-{
-#ifdef USE_RAND
-   return ((int) ((float) range * rand () / (RAND_MAX + 1.0)));
-#else
-   return (random () % range);
-#endif
-}
-
-/*
  * Convert an str to long. Returns TRUE if successful,
  * FALSE otherwise.
  */

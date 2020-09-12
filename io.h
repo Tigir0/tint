@@ -84,7 +84,7 @@ void out_gotoxy (int x,int y);
 void out_putch (char ch);
 
 /* Write a string to the screen */
-void out_printf (char *format, ...);
+void out_printf (const char*format, ...);
 
 /* Refresh screen */
 void out_refresh ();

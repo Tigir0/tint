@@ -138,7 +138,7 @@ void out_putch (char ch)
 
 /* Put a unicode character on the screen */
 /* Put a string on the screen */
-void out_printf (char *format, ...)
+void out_printf (const char*format, ...)
 {
    va_list ap;
    va_start (ap,format);

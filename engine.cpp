@@ -285,13 +285,13 @@ static int droplines (board_t board)
 }
 
 /* shuffle int array */
-void shuffle (int *array, size_t n)
+void shuffle (int *array, size_t n, mt19937 & rnd)
 {
    size_t i;
    for (i = 0; i < n - 1; i++)
    {
       int range = (int)(n - i);
-      size_t j = i + rand_value(range);
+      size_t j = i + rnd() % range;
       int t = array[j];
       array[j] = array[i];
       array[i] = t;
@@ -301,27 +301,26 @@ void shuffle (int *array, size_t n)
 /*
  * Initialize specified tetris engine
  */
-void engine_init (engine_t *engine,void (*score_function)(engine_t *))
+void engine_init (engine_t *engine, int rand_init,void (*score_function)(engine_t *))
 {
+   engine->random = mt19937(rand_init);
    int i;
    engine->shadow = FALSE;
+   engine->finished = FALSE;
    engine->score_function = score_function;
    /* intialize values */
    engine->curx = 5;
    engine->cury = 1;
    engine->curx_shadow = 5;
    engine->cury_shadow = 1;
-   engine->bag_iterator = 0;
-   /* create and randomize bag */
-   for (int j = 0; j < NUMSHAPES; j++) engine->bag[j] = j;
-   shuffle (engine->bag,NUMSHAPES);
-   engine->curshape = engine->bag[engine->bag_iterator%NUMSHAPES];
-   engine->nextshape = engine->bag[(engine->bag_iterator+1)%NUMSHAPES];
-   engine->bag_iterator++;
+   engine->curshape = engine->random() % NUMSHAPES;
+   engine->nextshape = engine->random() % NUMSHAPES;
    engine->score = 0;
    engine->status.moves = engine->status.rotations = engine->status.dropcount = engine->status.efficiency = engine->status.droppedlines = 0;
    /* initialize shapes */
    memcpy (engine->shapes,SHAPES,sizeof (shapes_t));
+   memset (engine->status.shapecount,0,NUMSHAPES * sizeof (int));
+   engine->status.shapecount[engine->curshape]++;
    /* initialize board */
    memset (engine->board,0,sizeof (board_t));
    for (i = 0; i < NUMCOLS; i++) engine->board[i][NUMROWS - 1] = engine->board[i][NUMROWS - 2] = WALL;
@@ -333,6 +332,7 @@ void engine_init (engine_t *engine,void (*score_function)(engine_t *))
  */
 void engine_move (engine_t *engine,action_t action)
 {
+   if(engine->finished) return;
    switch (action)
 	 {
 		/* move shape to the left if possible */
@@ -389,11 +389,8 @@ int engine_evaluate (engine_t *engine)
 		engine->cury = 1;
 		engine->curx_shadow = 5;
 		engine->cury_shadow = 1;
-		engine->curshape = engine->bag[engine->bag_iterator%NUMSHAPES];
-		/* shuffle bag before first item in bag would be reused */
-		if ((engine->bag_iterator+1) % NUMSHAPES == 0) shuffle(engine->bag, NUMSHAPES);
-		engine->nextshape = engine->bag[(engine->bag_iterator+1)%NUMSHAPES];
-		engine->bag_iterator++;
+		engine->curshape = engine->nextshape;
+		engine->nextshape = engine->random() % NUMSHAPES;
 		/* initialize shapes */
 		memcpy (engine->shapes,SHAPES,sizeof (shapes_t));
 		/* return games status */

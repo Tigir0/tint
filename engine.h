@@ -30,6 +30,7 @@
  */
 
 #include "typedefs.h"		/* bool */
+#include <random>
 
 /*
  * Macros
@@ -47,6 +48,8 @@
 
 /* Wall id - Arbitrary, but shouldn't have the same value as one of the colors */
 #define WALL 16
+
+typedef std::mt19937 mt19937;
 
 /*
  * Type definitions
@@ -69,6 +72,7 @@ typedef struct
 
 typedef struct
 {
+   int shapecount[NUMSHAPES];
    int moves;
    int rotations;
    int dropcount;
@@ -79,15 +83,15 @@ typedef struct
 
 typedef struct engine_struct
 {
+   bool finished;
    bool shadow;                                     /* show shadow */
    int curx,cury,curx_shadow,cury_shadow;			/* coordinates of current piece */
    int curshape,nextshape;							/* current & next shapes */
    int score;										/* score */
-   int bag_iterator;								/* iterator for randomized bag */
-   int bag[NUMSHAPES];								/* pointer to bag of shapes */
    shapes_t shapes;									/* shapes */
    board_t board;									/* board */
    status_t status;									/* current status of shapes */
+   mt19937 random;
    void (*score_function)(struct engine_struct *);	/* score function */
 } engine_t;
 
@@ -106,7 +110,7 @@ extern const shapes_t SHAPES;
 /*
  * Initialize specified tetris engine
  */
-void engine_init (engine_t *engine,void (*score_function)(engine_t *));
+void engine_init (engine_t *engine, int rand_init,void (*score_function)(engine_t *));
 
 /*
  * Perform the given action on the specified tetris engine
